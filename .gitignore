@@ -54,3 +54,6 @@ dkms.conf
 #Ignore file Debug
 Debug
 *.launch
+
+#metadata
+.Metadata
