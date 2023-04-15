@@ -55,8 +55,9 @@ dkms.conf
 Debug
 *.launch
 
-#metadata
+#IDE
 .metadata
+.settings
 
 *.cproject
 *.project
