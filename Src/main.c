@@ -1,4 +1,3 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c
@@ -15,57 +14,21 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
+
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "API_sensors.h"
 #include "API_measurement.h"
 #include "API_debounce.h"
-#include "API_dobleclick.h"
-#include "sht4x.h"
-#include "sunrise.h"
+#include "API_doubleclick.h"
 #include "API_uart.h"
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
-I2C_HandleTypeDef hi2c2;
-
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
-
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_I2C1_Init(void);
 void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c);
 void Error_Handler(void);
-
-
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
@@ -73,57 +36,31 @@ void Error_Handler(void);
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
   /* Configure the system clock */
   SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
-
+  /* Initialize BSP PB for BUTTON_USER */
+  BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
+  //Init UART
   uartInit();
+  //init I2C
   MX_I2C1_Init();
   HAL_I2C_MspInit(&hi2c1);
-  sht4x_init(&hi2c1);
-  sunrise_init(&hi2c1);
-  /* USER CODE BEGIN 2 */
-
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-	/* Initialize BSP PB for BUTTON_USER */
-	BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
-	debounceFSM_init();
-	clickStateFSM_init();
-  	measurement_FSM_init();
+  //init drivers
+  init_sensors(&hi2c1);
+  //Init FSM
+  debounceFSM_init();
+  clickStateFSM_init();
+  measurement_FSM_init();
   while (1)
   {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-
 	  measurement_FSM_update();
 	  debounceFSM_update();
 	  clickFSM_update();
 
-
   }
-  /* USER CODE END 3 */
 }
 
 /**

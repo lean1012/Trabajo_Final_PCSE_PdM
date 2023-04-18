@@ -5,30 +5,30 @@
  *      Author: leandro
  */
 
+#include <API_doubleclick.h>
 #include "API_measurement.h"
 #include "API_delay.h"
-#include "sht4x.h"
-#include "sunrise.h"
+#include "API_sensors.h"
 #include "API_debounce.h"
-#include "API_dobleclick.h"
 #include "API_uart.h"
 #include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
 
+//logica de la aplicación
 
 typedef enum {
-	IDLE, MEASURMENT, CONFIGURATION,
+	IDLE, MEASURMENT, WAIT, CONFIGURATION,
 } measurment_state_t;
+
+static struct air air_p;
 
 delay_t measurement_period;
 uint16_t period_ms = 500;
 
-struct air {
-	uint16_t co2;
-	uint16_t temp;
-	uint16_t hum;
-};
-
-struct air air_p;
+#define ZERO_CLICK 0
+#define ONE_CLICK 1
+#define TWO_CLICK 2
 
 static measurment_state_t actual_state;
 
@@ -36,19 +36,7 @@ void measurement_FSM_init();		// debe cargar el estado inicial
 void measurement_FSM_update();	// debe leer las entradas, resolver la lógica de
 // transición de estados y actualizar las salidas
 
-//delayInit(&led_seq_delay[i],led_delay_seq[i]);
-void measurement_FSM_init() {
-	actual_state = MEASURMENT;
-	delayInit(&measurement_period, period_ms);
-	delayRead(&measurement_period);
-}
-
-void measurement() {
-
-	sunrise_read_co2(&air_p.co2);
-	sht4x_temp_hum_low_presition(&air_p.temp, &air_p.hum);
-
-}
+static void configuration_s();
 
 void print_measurement() {
 
@@ -56,32 +44,55 @@ void print_measurement() {
 
 	uint8_t text_co2[] = "CO2: ";
 	uartSendString(text_co2);
-	itoa(air_p.co2,buffer,10);   // here 2 means binary
-	uartSendString(buffer);
-	memset(buffer,0, sizeof(buffer));
+	itoa(air_p.co2, buffer, 10);   // here 2 means binary
+	uartSendString((uint8_t*)buffer);
+	memset(buffer, 0, sizeof(buffer));
 
 	uint8_t tab[] = "\t";
 	uartSendString(tab);
 
 	uint8_t text_temp[] = "Temp: ";
 	uartSendString(text_temp);
-	itoa(air_p.temp,buffer,10);   // here 2 means binary
-	uartSendString(buffer);
-	memset(buffer,0, sizeof(buffer));
+	itoa(air_p.temp, buffer, 10);   // here 2 means binary
+	uartSendString((uint8_t*)buffer);
+	memset(buffer, 0, sizeof(buffer));
 
 	uartSendString(tab);
 
 	uint8_t text_hum[] = "Hum: ";
 	uartSendString(text_hum);
-	itoa(air_p.hum,buffer,10);   // here 2 means binary
-	uartSendString(buffer);
-	memset(buffer,0, sizeof(buffer));
+	itoa(air_p.hum, buffer, 10);   // here 2 means binary
+	uartSendString((uint8_t*)buffer);
+	memset(buffer, 0, sizeof(buffer));
 
 	uint8_t text_fin[] = "\r\n";
 	uartSendString(text_fin);
 
+}
+
+void print_text_conf() {
+	uint8_t send_text[] =
+			"Configuración... Ingrese la frecuencia de muestreo en segundos con el siguiente formato MXX\r\n";
+	uartSendString(send_text);
+}
+
+void print_text_meansurement() {
+	uint8_t send_text[] = "Midiendo... \r\n";
+	uartSendString(send_text);
+}
 
 
+void measurement_FSM_init() {
+	actual_state = WAIT;
+	print_text_meansurement();
+	delayInit(&measurement_period, period_ms);
+	delayRead(&measurement_period);
+}
+
+
+void print_text_idle() {
+	uint8_t send_text[] = "Pausa... \r\n";
+	uartSendString(send_text);
 }
 
 void measurement_FSM_update() {
@@ -89,69 +100,85 @@ void measurement_FSM_update() {
 
 	case IDLE:
 		switch (click()) {
-		case 0:
+		case ZERO_CLICK:
 			actual_state = IDLE;
+			//no hay salida
 			break;
-		case 1:
-			actual_state = MEASURMENT;
+		case ONE_CLICK:
+			print_text_meansurement();
+			delayRead(&measurement_period); //disparo el timer
+			actual_state = WAIT;
+
 			break;
-		case 2:
+		case TWO_CLICK:
 			actual_state = CONFIGURATION;
+			print_text_conf();
 			break;
+		default:
+			print_text_idle();
+			actual_state = IDLE;
 		}
 		break;
 
-	case MEASURMENT:
-		if (delayRead(&measurement_period)) {
-			measurement();
-			print_measurement();
-			delayRead(&measurement_period); //disparo el timer
-		}
+	case WAIT:
 		switch (click()) {
-		case 0:
-			actual_state = MEASURMENT;
+		case ZERO_CLICK:
+			if (delayRead(&measurement_period)) {
+				measurement(&air_p);
+				print_measurement();
+				delayRead(&measurement_period); //disparo el timer
+			}
 			break;
-		case 1:
+		case ONE_CLICK:
+			print_text_idle();
 			actual_state = IDLE;
 			break;
-		case 2:
+		case TWO_CLICK:
+			print_text_conf();
 			actual_state = CONFIGURATION;
 			break;
+		default:
+			print_text_idle();
+			actual_state = IDLE;
 		}
 		break;
+	case MEASURMENT:
+		actual_state = WAIT;
 
 	case CONFIGURATION:
+		configuration_s();
 		if (click() != 0) {
+			delayRead(&measurement_period); //disparo el timer
+			print_text_meansurement();
 			actual_state = MEASURMENT;
 		}
 		break;
 
 	default:
-		actual_state = IDLE;
-		break;
-
+		print_text_idle();
+		actual_state = WAIT;
 	}
 }
 
-void configuration_FSM() {
+static uint8_t datos[5];
+void configuration_s() {
+	static uint8_t conf[5];
+	memset(conf, 0, sizeof(conf));
+	uartReceiveStringSize(conf, 5);
+	if (strcmp((char*)conf, (char*)"\000\000\000\000\000")) {
+		if (conf[0] == 'M') {
+			uint8_t text_err[] =
+					"Se ha cambiado la frecuencia correctamente\r\n";
 
-	switch (actual_state) {
+			uartSendString(text_err);
+			memcpy(datos, &conf[1], 2);
+			uint16_t val = 1000*atoi((char*)datos);
+			delayWrite(&measurement_period, val);
 
-	case IDLE:
-		//nothing
-		break;
-
-	case MEASURMENT:
-
-		break;
-
-	case CONFIGURATION:
-		//configuration_FSM();
-		break;
-
-	default:
-		actual_state = IDLE;
-		break;
-
+		} else {
+			uint8_t text_err[] = "Comando no válido\r\n";
+			uartSendString(text_err);
+		}
 	}
+
 }

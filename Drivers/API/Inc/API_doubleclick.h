@@ -5,8 +5,8 @@
  *      Author: leandro
  */
 
-#ifndef API_INC_API_DOBLECLICK_H_
-#define API_INC_API_DOBLECLICK_H_
+#ifndef API_INC_API_DOUBLECLICK_H_
+#define API_INC_API_DOUBLECLICK_H_
 
 
 
@@ -32,4 +32,4 @@ void clickFSM_update();
 uint8_t click();
 
 
-#endif /* API_INC_API_DOBLECLICK_H_ */
+#endif /* API_INC_API_DOUBLECLICK_H_ */

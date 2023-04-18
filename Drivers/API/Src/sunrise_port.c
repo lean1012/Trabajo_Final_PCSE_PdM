@@ -41,6 +41,6 @@ void sunrise_sleep(uint16_t time_delay){
 	HAL_Delay(time_delay);
 }
 
-void sunrise_print(uint8_t* data){
+void sunrise_print(uint8_t* data, uint16_t size){
 }
 

@@ -5,10 +5,11 @@
  *      Author: leandro
  */
 
-#include "API_debounce.h"
 #include "API_delay.h"
-#include "stm32f4xx_hal.h"  		/* <- HAL include */
-#include "stm32f4xx_nucleo_144.h" 	/* <- BSP include */
+#include "API_doubleclick.h"
+#include "API_debounce.h"
+
+#define WAIT_SECOND_CLICK 500
 
 typedef enum {
 	IDLE,
@@ -18,12 +19,14 @@ typedef enum {
 static delay_t delay_click;
 static clickState_t actual_state_click;
 
+
+
 /*
  * Incializa la máquina de estados en BUTTON_UP
  */
 void clickStateFSM_init() {
 	actual_state_click = IDLE;
-	delayInit(&delay_click, 500);
+	delayInit(&delay_click, WAIT_SECOND_CLICK);
 }
 /*
  * Máquina de estados para resolver los problemas de rebote del botón
@@ -46,18 +49,13 @@ void clickFSM_update() {
 
 		if (delayRead(&delay_click)) {
 			if (readKey()) {
-
 				click_count = 2;
 			} else {
-
 				click_count = 1;
-
 			}
 			actual_state_click = IDLE;
 		}
-
 		break;
-
 	default:
 		actual_state_click = IDLE;
 		break;

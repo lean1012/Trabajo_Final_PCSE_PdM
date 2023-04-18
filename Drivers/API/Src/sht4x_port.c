@@ -1,5 +1,6 @@
 #include "sht4x_port.h"
 #include "stm32f4xx_hal.h"  		/* <- HAL include */
+#include "API_uart.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -41,7 +42,8 @@ void sht4x_sleep(uint16_t time_delay){
 	HAL_Delay(time_delay);
 }
 
-void sht4x_print(uint8_t* data){
+void sht4x_print(uint8_t* data, uint16_t size){
+	uartSendStringSize(data, size);
 
 }
 

@@ -1,17 +1,11 @@
 #include "sunrise.h"
+#include "sunrise_port.h"
 #include <stdint.h>
 #include <stdbool.h>
 
 
-int8_t sunrise_write(uint16_t address, const uint8_t* data, uint16_t data_length);
-
-int8_t sunrise_read(uint16_t address, const uint8_t* data, uint16_t data_length);
-
-int8_t sunrise_sleep(uint8_t* data);
-
-void sunrise_print();
-
-void sunrise_init_port(void* p_i2c);
+#define SUNRISE_I2C_ADDRESS 0x68
+#define SUNRISE_SERIAL_NUMBER 0xA7
 
 
 static uint16_t buffer_to_uint16_t(const uint8_t* bytes) {
@@ -30,7 +24,6 @@ int8_t sunrise_read_co2(uint16_t * co2){
 	buffer[0] = 0x00;
 
 	err = sunrise_write(SUNRISE_I2C_ADDRESS,buffer,0);
-
 	err = sunrise_write(SUNRISE_I2C_ADDRESS,buffer,1);
 	if (err < 0) {
 		return err;
@@ -40,6 +33,9 @@ int8_t sunrise_read_co2(uint16_t * co2){
 			return err;
 	}
 	*co2 = buffer_to_uint16_t(&buffer[6]);
+
+	//control de parametors
+
 	return 0;
 }
 

@@ -9,8 +9,6 @@
 #define API_INC_API_UART_H_
 
 #include <stdio.h>
-#include "stm32f4xx_hal.h"  		/* <- HAL include */
-#include "stm32f4xx_nucleo_144.h" 	/* <- BSP include */
 #include <stdbool.h>
 
 typedef bool bool_t;

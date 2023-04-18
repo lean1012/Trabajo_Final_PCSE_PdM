@@ -1,5 +1,13 @@
-#ifndef __API_sht4x_H
-#define __API_sht4x_H
+/*
+ * sht4x.h
+ *
+ *  Created on: Abr 2, 2023
+ *      Author: leandro
+ */
+
+
+#ifndef __sht4x_H
+#define __sht4x_H
 #include <stdint.h>
 #include <stdbool.h>
 

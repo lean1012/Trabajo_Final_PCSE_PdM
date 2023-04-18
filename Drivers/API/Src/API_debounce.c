@@ -24,15 +24,6 @@ static delay_t delay;
 static debounceState_t actual_state;
 static bool_t key_press;
 
-static void buttonPressed(){
-	//BSP_LED_Toggle(LED_GREEN);
-}
-/*
- * Tooglea el LED ROJO (LED3)
- */
-static void buttonReleased(){
-	//BSP_LED_Toggle(LED_RED);
-}
 /*
  * Incializa la máquina de estados en BUTTON_UP
  */
@@ -63,7 +54,7 @@ void debounceFSM_update(){
 			if(delayRead(&delay)){
 				if(BSP_PB_GetState(BUTTON_USER)){
 					actual_state = BUTTON_DOWN;
-					buttonPressed();
+					//buttonPressed();
 					key_press = true;
 				}else{
 					actual_state = BUTTON_UP;
@@ -87,7 +78,7 @@ void debounceFSM_update(){
 					actual_state = BUTTON_DOWN;
 				}else{
 					actual_state = BUTTON_UP;
-					buttonReleased();
+					//buttonReleased();
 
 				}
 			}

@@ -6,30 +6,34 @@
 #include "sht4x_port.h"
 
 #define SHT4X_I2C_ADDRESS 0x44
-#define SHT4X_SLEEP 100
-#define SHT4X_CRC_POLY		0x31
-#define SHT4X_CRC_INIT		0xFF
-#define STATUS_OK 0
-#define STATUS_ERR_BAD_DATA (-1)
-#define STATUS_CRC_FAIL (-2)
-#define STATUS_UNKNOWN_DEVICE (-3)
+#define SHT4X_SLEEP 10
+//registros sht4x
 #define SHT4X_SERIAL_NUMBER 0x89
 #define SHT4X_CMD_MEASURE_HPM 0xFD
 #define SHT4X_CMD_MEASURE_MPM 0xFD
 #define SHT4X_CMD_MEASURE_LPM 0xE0
-#define SHT4X_MEASUREMENT_DURATION_USEC 10000 /* 10ms "high repeatability" */
-#define SHT4X_MEASUREMENT_DURATION_LPM_USEC 2500 /* 2.5ms "low repeatability" */
-
+//
 #define RESPONSE_LENGHT 6
 
 
-
+/**
+ * @brief Convierte un array de 2 elementos uint_8 en el forma uint_16 usando MSB
+ * 
+ * @param bytes puntero al inicio del array
+ * @return uint16_t valor en 16bits
+ */
 
 static uint16_t buffer_to_uint16_t(const uint8_t* bytes) {
 
     return (uint16_t)bytes[0] << 8 | (uint16_t)bytes[1];
 }
 
+/**
+ * @brief Convierte los ticks devueltos por el registro de temperatura a un valor de grados celsius
+ * 
+ * @param bytes ticks
+ * @return uint16_t valor de temperatura
+ */
 static int16_t convert_ticks_to_celsius(uint16_t ticks) {
 	/**
 	 * Temperature = 175 * S_T / 65535 - 45
@@ -37,6 +41,12 @@ static int16_t convert_ticks_to_celsius(uint16_t ticks) {
     return ((ticks * 175) / 65535) - 45;
 }
 
+/**
+ * @brief Convierte los ticks devueltos por el registro de humedad a un valor de grados celsius
+ * 
+ * @param bytes ticks
+ * @return uint16_t valor de humedad
+ */
 static int16_t convert_ticks_to_percent_rh(uint16_t ticks) {
 	/**
 	 * Relative Humidity = 125 * (S_RH / 65535) - 6
@@ -44,21 +54,29 @@ static int16_t convert_ticks_to_percent_rh(uint16_t ticks) {
     return (((ticks * 125)) / 65535) - 6;
 }
 
-
+/**
+ * @brief Lectura de los datos de temperatura y humedad segun la presición indicada. Los datos son devueltos en ticks
+ * 
+ * @param precision presición a realizar la medida
+ * @param temperature_ticks puntero donde se alojará la temperatura en ticks
+ * @param humidity_ticks puntero a donde se alojará la humedad en ticks
+ * @return int16_t 0 OK, -1 error
+ */
 static int16_t sht4x_measure_ticks(uint8_t precision, uint16_t* temperature_ticks, uint16_t* humidity_ticks){
 	uint8_t buffer[RESPONSE_LENGHT];
 	int8_t err;
 	buffer[0] = precision;
 	err = sht4x_write(SHT4X_I2C_ADDRESS,buffer,1);
 	if (err < 0) {
-		sht4x_print("Error en la escritura. \n");
+		uint8_t msg[] = "Error en la escritura. \r\n";
+		sht4x_print(msg,sizeof(msg));
 		return err;
 	}
-	sht4x_sleep(100);
-
+	sht4x_sleep(SHT4X_SLEEP);
 	err = sht4x_read(SHT4X_I2C_ADDRESS,buffer,sizeof(buffer));
 	if (err < 0) {
-		sht4x_print("Error en la lectura.\n");
+		uint8_t msg[] = "Error en la lectura.\r\n";
+		sht4x_print(msg,sizeof(msg));
 		return err;
 	}
 
@@ -83,10 +101,15 @@ static int16_t sht4x_measure_ticks(uint8_t precision, uint16_t* temperature_tick
 int8_t sht4x_init(void * i2c_init){
 	sht4x_init_port(i2c_init);
 	uint16_t serial_number_sht4x = 0;
-	if(sht4x_read_serial_number(&serial_number_sht4x)){
-		if(serial_number_sht4x!=0)
+	if(sht4x_read_serial_number(&serial_number_sht4x)==0){
+		if(serial_number_sht4x!=0){
+			uint8_t msg[] = "Inicialización correcta del sensor sht4x. \r\n";
+			sht4x_print(msg,sizeof(msg));
 			return 0;
+		}
 	}
+	uint8_t msg[] = "Error en la inicialización del sensor sht4x. \r\n";
+	sht4x_print(msg,sizeof(msg));
 	return -1;
 }
 
@@ -99,7 +122,7 @@ int8_t sht4x_read_serial_number(uint16_t * p_serial_number){
 	if (err < 0) {
 		return err;
 	}
-	sht4x_sleep(100);
+	sht4x_sleep(SHT4X_SLEEP);
 	err = sht4x_read(SHT4X_I2C_ADDRESS,buffer,sizeof(buffer));
 
 	if (err < 0) {
@@ -121,6 +144,8 @@ int8_t sht4x_temp_hum_low_presition(uint16_t * temperature, uint16_t* humidity){
 	}
 	*temperature = convert_ticks_to_celsius(temp_ticks);
 	*humidity = convert_ticks_to_percent_rh(hum_ticks);
+
+	//control de parametros
 
 	return 0;
 }
