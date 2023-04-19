@@ -1,17 +1,26 @@
+/*
+ * sunrise.c
+ *
+ *  Created on: Abr 2, 2023
+ *      Author: leandro
+ */
+
 #include "sunrise.h"
 #include "sunrise_port.h"
 #include <stdint.h>
-#include <stdbool.h>
-
 
 #define SUNRISE_I2C_ADDRESS 0x68
 #define SUNRISE_SERIAL_NUMBER 0xA7
 
-
+/**
+ * @brief Convierte 2 elementos uint8_t en un uint16_t usando MSB
+ * 
+ * @param bytes puntero al inicio del array
+ * @return uint16_t valor en 16bits
+ */
 static uint16_t buffer_to_uint16_t(const uint8_t* bytes) {
     return (uint16_t)bytes[0] << 8 | (uint16_t)bytes[1];
 }
-
 
 int8_t sunrise_init(void * i2c_init){
 	sunrise_init_port(i2c_init);
@@ -22,7 +31,6 @@ int8_t sunrise_read_co2(uint16_t * co2){
 	uint8_t buffer[8];
 	int8_t err;
 	buffer[0] = 0x00;
-
 	err = sunrise_write(SUNRISE_I2C_ADDRESS,buffer,0);
 	err = sunrise_write(SUNRISE_I2C_ADDRESS,buffer,1);
 	if (err < 0) {
@@ -33,9 +41,10 @@ int8_t sunrise_read_co2(uint16_t * co2){
 			return err;
 	}
 	*co2 = buffer_to_uint16_t(&buffer[6]);
-
-	//control de parametors
-
+	//controlo que el valor a enviar esté dentro de los parámetros del sensor ()
+	if((*co2 > 0) && (*co2 < 10000)){
+		return -1;
+	}
 	return 0;
 }
 

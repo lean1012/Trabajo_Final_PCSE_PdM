@@ -16,7 +16,6 @@
 typedef bool bool_t;
 
 #define DEBOUNCE_TIME 40
-#define DEBOUNCE_TIME_LONG 2000
 
 /*
  * Incializa la máquina de estados en BUTTON_UP

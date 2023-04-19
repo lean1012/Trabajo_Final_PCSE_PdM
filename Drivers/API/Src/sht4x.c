@@ -1,12 +1,11 @@
 
 #include <stdint.h>
-#include <stdbool.h>
-
 #include "sht4x.h"
 #include "sht4x_port.h"
 
 #define SHT4X_I2C_ADDRESS 0x44
 #define SHT4X_SLEEP 10
+
 //registros sht4x
 #define SHT4X_SERIAL_NUMBER 0x89
 #define SHT4X_CMD_MEASURE_HPM 0xFD
@@ -14,6 +13,7 @@
 #define SHT4X_CMD_MEASURE_LPM 0xE0
 //
 #define RESPONSE_LENGHT 6
+
 
 
 /**
@@ -124,7 +124,6 @@ int8_t sht4x_read_serial_number(uint16_t * p_serial_number){
 	}
 	sht4x_sleep(SHT4X_SLEEP);
 	err = sht4x_read(SHT4X_I2C_ADDRESS,buffer,sizeof(buffer));
-
 	if (err < 0) {
 			return err;
 	}
@@ -144,9 +143,6 @@ int8_t sht4x_temp_hum_low_presition(uint16_t * temperature, uint16_t* humidity){
 	}
 	*temperature = convert_ticks_to_celsius(temp_ticks);
 	*humidity = convert_ticks_to_percent_rh(hum_ticks);
-
-	//control de parametros
-
 	return 0;
 }
 
@@ -157,7 +153,6 @@ int8_t sht4x_temp_hum_medium_presition(uint16_t * temperature, uint16_t* humidit
 	sht4x_measure_ticks(SHT4X_CMD_MEASURE_MPM, &temp_ticks, &hum_ticks);
 	*temperature = convert_ticks_to_celsius(temp_ticks);
 	*humidity = convert_ticks_to_percent_rh(hum_ticks);
-
 	return 0;
 }
 
@@ -168,7 +163,6 @@ int8_t sht4x_temp_hum_high_presition(uint16_t * temperature, uint16_t* humidity)
 	sht4x_measure_ticks(SHT4X_CMD_MEASURE_HPM, &temp_ticks, &hum_ticks);
 	*temperature = convert_ticks_to_celsius(temp_ticks);
 	*humidity = convert_ticks_to_percent_rh(hum_ticks);
-
 	return 0;
 }
 

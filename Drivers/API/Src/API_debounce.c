@@ -8,10 +8,11 @@
 
 #include "API_debounce.h"
 #include "API_delay.h"
-#include "stm32f4xx_hal.h"  		/* <- HAL include */
 #include "stm32f4xx_nucleo_144.h" 	/* <- BSP include */
 
-
+/*Estados para resolver el rebote del botón
+ * ver https://docs.google.com/presentation/d/19-_3vYQWjhZznpSB0fJqiIfhxkiMoVlrsakPLtWlMUE/edit#slide=id.g10118059909_0_38
+ */
 typedef enum{
 	BUTTON_UP,
 	BUTTON_FALLING,
@@ -48,20 +49,17 @@ void debounceFSM_update(){
 			}
 
 		break;
-
 		case BUTTON_FALLING:
 			//espero 40milisegundos y pregunto como está el botón
 			if(delayRead(&delay)){
 				if(BSP_PB_GetState(BUTTON_USER)){
 					actual_state = BUTTON_DOWN;
-					//buttonPressed();
 					key_press = true;
 				}else{
 					actual_state = BUTTON_UP;
 				}
 			}
 		break;
-
 		case BUTTON_DOWN:
 			if(BSP_PB_GetState(BUTTON_USER)){
 				actual_state = BUTTON_DOWN;
@@ -70,7 +68,6 @@ void debounceFSM_update(){
 				delayRead(&delay); //disparo el timer para irme al proximo estado con el timer activo;
 			}
 		break;
-
 		case BUTTON_RAISING:
 			//espero 40milisegundos y pregunto como está el botón
 			if(delayRead(&delay)){
@@ -78,12 +75,9 @@ void debounceFSM_update(){
 					actual_state = BUTTON_DOWN;
 				}else{
 					actual_state = BUTTON_UP;
-					//buttonReleased();
-
 				}
 			}
 		break;
-
 		default:
 			actual_state=BUTTON_UP;
 		break;

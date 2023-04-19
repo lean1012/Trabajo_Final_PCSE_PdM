@@ -8,12 +8,13 @@
 #ifndef __sunrise_port_H
 #define __sunrise_port_H
 
+#include <stdint.h>
+
 
 /**
- * @brief realiza una copia de la direccion a la configuracion i2c de configuración
+ * @brief Realiza una copia local a la configuracion i2c
  *
  * @param p_i2c puntero a la configuración i2c
- * @return int8_t 0 OK, -1 error
  */
 void sunrise_init_port(void* p_i2c);
 
@@ -38,7 +39,7 @@ int8_t sunrise_write(uint16_t address, const uint8_t* data, uint16_t data_length
 int8_t sunrise_read(uint16_t address, const uint8_t* data, uint16_t data_length);
 
 /**
- * @brief delay bloqueante
+ * @brief Delay bloqueante
  *
  * @param time_delay tiempo de espera en milisegundos
  */
@@ -47,7 +48,9 @@ int8_t sunrise_sleep(uint8_t* data);
 /**
  * @brief Escritura en consola por medio de UART
  *
- * @param data puntero los datos a enviar, este debe terminar con /0
+ * @param data puntero los datos a enviar
+ * @param size largo de los datos a enviar
+ * 
  */
 void sunrise_print(uint8_t* data, uint16_t size);
 

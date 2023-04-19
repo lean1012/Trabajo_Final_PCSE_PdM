@@ -8,14 +8,12 @@
 #ifndef __sunrise_H
 #define __sunrise_H
 #include <stdint.h>
-#include <stdbool.h>
-
 
 /**
- * @brief Inicializa el driver sunrise
- *
- * @param i2c_init Puntero a la configuración i2c
- * @return int8_t 0 OK, -1 error
+ * @brief Convierte 2 elementos uint8_t en un uint16_t usando MSB
+ * 
+ * @param bytes puntero al inicio del array
+ * @return uint16_t valor en 16bits
  */
 int8_t sunrise_init(void * i2c_init);
 

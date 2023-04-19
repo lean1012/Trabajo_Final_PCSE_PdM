@@ -9,15 +9,8 @@
 #ifndef __sht4x_H
 #define __sht4x_H
 #include <stdint.h>
-#include <stdbool.h>
 
-/**
- * @brief Lecutra del numero de seriel del sensor
- * 
- * @param p_serial_number puntero donde se devolvera el número de serie
- * @return int8_t 0 OK, -1 error
- */
-int8_t sht4x_read_serial_number(uint16_t * p_serial_number);
+
 /**
  * @brief Inicializa el driver sht4x
  * 
@@ -25,6 +18,15 @@ int8_t sht4x_read_serial_number(uint16_t * p_serial_number);
  * @return int8_t 0 OK, -1 error
  */
 int8_t sht4x_init(void * i2c_init);
+/**
+ * @brief Lecutra del numero de seriel del sensor
+ * 
+ * @param p_serial_number puntero donde se devolvera el número de serie
+ * @return int8_t 0 OK, -1 error
+ */
+
+int8_t sht4x_read_serial_number(uint16_t * p_serial_number);
+
 /**
  * @brief Lectura de temperatura y humedad con presición baja
  * 

@@ -50,7 +50,6 @@ bool_t uartInit(){
 	  }
 }
 void uartSendString(uint8_t * pstring){
-
 	//strlen cuenta los caracteres hasta un \0
 	uint16_t size = strlen((char *)pstring);
 	uint16_t uart_time_out = (uint16_t)(10.0*((size))*(1.0/UART_BaudRate)*10.0*1000.0);
@@ -59,7 +58,6 @@ void uartSendString(uint8_t * pstring){
 
 }
 void uartSendStringSize(uint8_t * pstring, uint16_t size){
-
 	/*calculo el tiempo como 10 bits de la transmisión UART * size (veces transmitidas) * velocidad (1/BAUDRATE) + margen multiplico x10
 	 *ultimo multiplico por 1000 para los ms*/
 	uint16_t uart_time_out = (uint16_t)(10.0*((size))*(1.0/UART_BaudRate)*10.0*1000.0);

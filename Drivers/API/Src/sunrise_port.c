@@ -1,9 +1,16 @@
+/*
+ * sunrise_port.c
+ *
+ *  Created on: Abr 2, 2023
+ *      Author: leandro
+ */
+
 #include "sht4x_port.h"
 #include "stm32f4xx_hal.h"  		/* <- HAL include */
 #include <stdint.h>
-#include <stdbool.h>
 
-I2C_HandleTypeDef *p_hi2c_sunrise;
+/*Copia local de la configuración i2c*/
+static I2C_HandleTypeDef *p_hi2c_sunrise;
 
 /*
  *HAL_OK       = 0x00U,
@@ -42,5 +49,6 @@ void sunrise_sleep(uint16_t time_delay){
 }
 
 void sunrise_print(uint8_t* data, uint16_t size){
+	uartSendStringSize(data, size);
 }
 
