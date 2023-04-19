@@ -6,15 +6,15 @@ El proyecto implementa dos drivers portables para sensores que permiten medir va
 
 Detalle de los módulos:
 
-sht4x.c sht4x.h -> Driver portables del sensor de humedad y temperatura
-sht4x_port.c sht4x_port.h -> Capa de abstracción del driver sht4x
-sunrise.c sunrise.h -> Driver portable del sensor de Co2
-sunrise_port.c sunrise_port.h -> Capa de abstracción del driver sunrise
-API_delay.c API_delay.h  -> Implementa delay no bloqueante
-API_doubonce.c API_doubonce.h  -> Implementa una FSM para el antirebote del botón
-API_doubleclick.c API_doubleclick.h -> Implementa una FSM para agregar la posibilidad de diferenciar 1 click o 2 click mediante el mismo botón
-API_uart.c API_uart.h -> Implementa funciones de UART
-API_measurement.c API_measurement.h -> Implementa una FSM para realizar la lógica de la aplicación
-API_sensors.c API_sensors.h -> Agrupa todos los sensores
+sht4x.c sht4x.h -> Driver portables del sensor de humedad y temperatura  
+sht4x_port.c sht4x_port.h -> Capa de abstracción del driver sht4x  
+sunrise.c sunrise.h -> Driver portable del sensor de Co2  
+sunrise_port.c sunrise_port.h -> Capa de abstracción del driver sunrise  
+API_delay.c API_delay.h  -> Implementa delay no bloqueante  
+API_doubonce.c API_doubonce.h  -> Implementa una FSM para el antirebote del botón  
+API_doubleclick.c API_doubleclick.h -> Implementa una FSM para agregar la posibilidad de diferenciar 1 click o 2 click mediante el mismo botón  
+API_uart.c API_uart.h -> Implementa funciones de UART  
+API_measurement.c API_measurement.h -> Implementa una FSM para realizar la lógica de la aplicación  
+API_sensors.c API_sensors.h -> Agrupa todos los sensores  
 
 
