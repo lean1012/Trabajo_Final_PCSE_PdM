@@ -65,13 +65,23 @@ int8_t sunrise_init(void *i2c_init) {
 	return 0;
 }
 
+/*Despierta el sensor sunrise*/
+static int8_t weak_sunrise(uint8_t address){
+
+	int8_t err = sunrise_write(address, 0, 0);
+}
+
 static int8_t write_multiple_register(uint8_t address, uint8_t reg_addr_start,
 		uint8_t num_reg, uint8_t *data_tx) {
 
-	int8_t err = sunrise_write(address, &reg_addr_start, 0);
-	if (err < 0) {
-		return err;
-	}
+	/*
+	 * Antes de comunuicarse con el sensor se tiene que despertar, ya que pasados 15ms de la última comunicación i2c 
+	 * entra en modo suspención.
+	 * Para activalor se envía un msj i2c sin datos, solo con un msj enviando la direccion del sensor 
+	 * (INICIO, dirección del sensor, PARADA).
+	 * Luego está pronto para realizar las operaciones de lectura/escritura.
+	*/
+	weak_sunrise(address);
 	uint8_t buffer[num_reg + 1];
 	// primero es la dirección
 	buffer[0] = reg_addr_start;
@@ -79,16 +89,25 @@ static int8_t write_multiple_register(uint8_t address, uint8_t reg_addr_start,
 	for (uint8_t i = 0; i < num_reg; i++) {
 		buffer[i + 1] = data_tx[i];
 	}
-
-	err = sunrise_write(address, buffer, sizeof(buffer));
+	int8_t err = sunrise_write(address, buffer, sizeof(buffer));
 	if (err < 0) {
 		return err;
 	}
 	return 0;
 }
 
+
 static int8_t read_multiple_register(uint8_t address, uint8_t reg_addr_start,
 		uint8_t num_reg, uint8_t *data_rx) {
+	
+	/*
+	 * Antes de comunuicarse con el sensor se tiene que despertar, ya que pasados 15ms de la última comunicación i2c 
+	 * entra en modo suspención.
+	 * Para activalor se envía un msj i2c sin datos, solo con un msj enviando la direccion del sensor 
+	 * (INICIO, dirección del sensor, PARADA).
+	 * Luego está pronto para realizar las operaciones de lectura/escritura.
+	*/
+	weak_sunrise(address);
 	int8_t err = sunrise_write(address, &reg_addr_start, 0);
 	err = sunrise_write(address, &reg_addr_start, 1);
 	if (err < 0) {
@@ -102,7 +121,7 @@ static int8_t read_multiple_register(uint8_t address, uint8_t reg_addr_start,
 }
 
 int8_t sunrise_read_co2_filtered(uint16_t *co2) {
-	// 8 es la cantidad de registros entre la medida y el status
+	// registro de doble byte => 2
 	uint8_t rx[2];
 	int8_t err = read_multiple_register(SUNRISE_I2C_ADDRESS,
 	CO2_FILTERED_PRESSURE_MSB, 2, rx);
@@ -111,7 +130,7 @@ int8_t sunrise_read_co2_filtered(uint16_t *co2) {
 		return err;
 	}
 	*co2 = buffer_to_uint16_t(rx);
-	// controlo que el valor a enviar esté dentro de los parámetros del sensor (0-10000ppm de Co2 es capaz de leer)
+	// controlo que el valor a enviar esté dentro de los parámetros del sensor (0-10000ppm de Co2 capaz de leer)
 	if ((*co2 > 0) && (*co2 < 10000)) {
 		return -1;
 	}
@@ -119,7 +138,7 @@ int8_t sunrise_read_co2_filtered(uint16_t *co2) {
 }
 
 int8_t sunrise_read_co2_unfiltered(uint16_t *co2) {
-	// 8 es la cantidad de registros entre la medida y el status
+	// registro de doble byte => 2
 	uint8_t rx[2];
 	int8_t err = read_multiple_register(SUNRISE_I2C_ADDRESS,
 	CO2_UNFILTERED_PRESSURE_MSB, 2, rx);
@@ -135,14 +154,14 @@ int8_t sunrise_read_co2_unfiltered(uint16_t *co2) {
 }
 
 int8_t read_ABC_status(uint8_t *ABC_status) {
-
+	// registro de un byte => 1
 	uint8_t rx[1];
 	int8_t err = read_multiple_register(SUNRISE_I2C_ADDRESS, METER_CONTROL, 1,
 			rx);
 	if (err < 0) {
 		return err;
 	}
-	// me qudo solamente con el bit 1 que indica el status ABC
+	//Dentro del registro de control el bit1 representa el ABC calibration
 	rx[0] = rx[0] & 0x0002;
 	if (rx[0] == 0x0000) {
 		*ABC_status = 1;
@@ -158,6 +177,7 @@ int8_t read_ABC_status(uint8_t *ABC_status) {
 }
 
 int8_t enable_ABC() {
+	// registro de un byte => 1
 	uint8_t rx[1];
 	int8_t err = read_multiple_register(SUNRISE_I2C_ADDRESS, METER_CONTROL, 1,
 			rx);
@@ -174,13 +194,14 @@ int8_t enable_ABC() {
 }
 
 int8_t disable_ABC() {
+	// registro de un byte => 1
 	uint8_t rx[1];
 	int8_t err = read_multiple_register(SUNRISE_I2C_ADDRESS, METER_CONTROL, 1,
 			rx);
 	if (err < 0) {
 		return err;
 	}
-	// para habilitar ABC tengo que poner el bit1 en 1
+	// Para deshabilitar ABC tengo que poner el Bit1 en 1
 	rx[0] = rx[0] | 0x0002;
 	write_multiple_register(SUNRISE_I2C_ADDRESS, METER_CONTROL, 1, rx);
 	if (err < 0) {
@@ -191,6 +212,7 @@ int8_t disable_ABC() {
 
 int8_t read_measurement_mode(uint8_t *mode, uint16_t *period,
 		uint16_t *number_samples) {
+	// 5 byte de registros se leen
 	uint8_t number_reg_read = 5;
 	uint8_t rx[number_reg_read];
 	int8_t err = read_multiple_register(SUNRISE_I2C_ADDRESS, MEASUREMENT_MODE,

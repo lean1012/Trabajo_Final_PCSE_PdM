@@ -34,7 +34,8 @@ static uint16_t period_init_ms = 500;
 
 /*Imprimo los valores de Co2, humedad y temperatura en consola separados con un tabulador, al final se agrega salto de linea*/
 static void print_measurement() {
-	char buffer[10];
+	// 6 = 5 cifras + el caracter /0
+	char buffer[6];
 	uint8_t text_co2[] = "CO2: ";
 	uartSendString(text_co2);
 	itoa(air_p.co2, buffer, 10);   
@@ -80,12 +81,12 @@ static void print_text_idle() {
 }
 /*Modifico el período de muestreo por medio de la consola*/
 static void frequency_configuration() {
-	uint8_t conf[5];
+	uint8_t conf[6];
 	memset(conf, 0, sizeof(conf));
 	uartReceiveStringSize(conf, 6);
 	/*Si se cumple que el comando ingresado es distinto de nulo realizo un control
-	 * de los parametros que comienzo con M y termino con /r
-	 * Luego convertir los caracteres XX a números (uso atoi)*/
+	 *de los parametros que comienzo con M y termino con /r
+	 *Luego convertir los caracteres XX a números (uso atoi)*/
 	if (strcmp((char*) conf, (char*) "\000\000\000\000\000")) {
 		if (conf[0] == 'M') {
 			uint8_t text_err[] =
@@ -110,12 +111,13 @@ void measurement_FSM_init() {
 	delayRead(&measurement_period);
 }
 
-/* ESTADO IDLE: no realiza mediciones ni configuraciones. 1 click empieza a medir, 2 clicks va a configuración
- * ESTADO WAIT: empezo a tomar medidas, espera X segundos para luego ir al estado MEASURMENT y tomar una medida 1 click va a IDLE
- * 2 click va a configuración
+/* Descripción de la FSM 
+ * ESTADO IDLE: no realiza mediciones ni configuraciones. Espera 1 click para empezar a medir o 2 clicks para ir a configuración
+ * ESTADO WAIT: Espera X segundos para luego ir al estado MEASURMENT y tomar una medida. 1 click vuelve a IDLE
+ * o 2 click va a configuración
  * ESTADO MEASURMENT: toma una medida de co2, humedad y temperatura e imprime por UART. Luego vuelve a WAIT
  * ESTADO CONFIGURATION: modifica el período en el cual se toman muestra, se ingresa por UART mediante el siguiente formato MXX 
- * donde XX son los segundos. Para volver a tomar medidas se realiza 1 o 2 click
+ * donde XX son los segundos. Para volver a tomar medidas se realiza 1 o 2 click.
  */
 void measurement_FSM_update() {
 	switch (actual_state) {

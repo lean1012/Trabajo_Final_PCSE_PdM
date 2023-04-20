@@ -15,15 +15,6 @@ void init_sensors(void * i2c_init){
 	 sht4x_init(i2c_init);
 	 sunrise_init(i2c_init);
 
-     uint8_t hola1;
-     uint16_t hola2;
-     uint16_t hola3;
-     read_measurement_mode(&hola1,&hola2,&hola3);
-     set_number_samples(6);
-     read_measurement_mode(&hola1,&hola2,&hola3);
-
-
-
 }
 
 void measurement(struct air * p_air) {

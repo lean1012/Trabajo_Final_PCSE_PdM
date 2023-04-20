@@ -33,7 +33,6 @@ void clickStateFSM_init() {
  * La máquina comienza esperando el primer click, una vez sucedido empieza a correr un
  * un timer no bloqueante. Al finalizar se verifica si se dió otro click, en caso que si
  * el resultado es doble click, caso contrario un solo click
- * 
  */
 void clickFSM_update() {
 

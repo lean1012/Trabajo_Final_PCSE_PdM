@@ -11,9 +11,8 @@
 #define SHT4X_CMD_MEASURE_HPM 0xFD
 #define SHT4X_CMD_MEASURE_MPM 0xFD
 #define SHT4X_CMD_MEASURE_LPM 0xE0
-//
+//tamaño en byte de la respuesta i2c
 #define RESPONSE_LENGHT 6
-
 
 
 /**
@@ -79,17 +78,9 @@ static int16_t sht4x_measure_ticks(uint8_t precision, uint16_t* temperature_tick
 		sht4x_print(msg,sizeof(msg));
 		return err;
 	}
-
-
-	//uint16_t temp = 0;
-	//uint16_t checksum_temp = 0;
-	//uint16_t hum = 0;
-	//uint16_t checksum_hum = 0;
-
 	*temperature_ticks = buffer_to_uint16_t(&buffer[0]);
-	//checksum_temp = buffer[2];
 	*humidity_ticks = buffer_to_uint16_t(&buffer[3]);
-	//checksum_hum = buffer[5];
+	//checkeo que los ticks sean mayores que 0
 	if(*temperature_ticks == 0 && *humidity_ticks == 0){
 		return -1;
 	}
@@ -150,7 +141,10 @@ int8_t sht4x_temp_hum_medium_presition(uint16_t * temperature, uint16_t* humidit
 
 	uint16_t temp_ticks = 0;
 	uint16_t hum_ticks = 0;
-	sht4x_measure_ticks(SHT4X_CMD_MEASURE_MPM, &temp_ticks, &hum_ticks);
+	int8_t err = sht4x_measure_ticks(SHT4X_CMD_MEASURE_MPM, &temp_ticks, &hum_ticks);
+	if(err<0){
+		return err;
+	}
 	*temperature = convert_ticks_to_celsius(temp_ticks);
 	*humidity = convert_ticks_to_percent_rh(hum_ticks);
 	return 0;
@@ -160,7 +154,10 @@ int8_t sht4x_temp_hum_high_presition(uint16_t * temperature, uint16_t* humidity)
 
 	uint16_t temp_ticks = 0;
 	uint16_t hum_ticks = 0;
-	sht4x_measure_ticks(SHT4X_CMD_MEASURE_HPM, &temp_ticks, &hum_ticks);
+	int8_t err = sht4x_measure_ticks(SHT4X_CMD_MEASURE_HPM, &temp_ticks, &hum_ticks);
+	if(err<0){
+		return err;
+	}
 	*temperature = convert_ticks_to_celsius(temp_ticks);
 	*humidity = convert_ticks_to_percent_rh(hum_ticks);
 	return 0;
