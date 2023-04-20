@@ -11,7 +11,7 @@
 #include <stdint.h>
 
 /**
- * @brief Realiza una copia local a la configuracion i2c
+ * @brief Guardo la dirección de memoria donde está la configuración del i2c
  *
  * @param p_i2c puntero a la configuración i2c
  */

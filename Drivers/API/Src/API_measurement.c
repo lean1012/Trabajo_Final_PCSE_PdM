@@ -16,21 +16,22 @@
 #include <string.h>
 
 
+#define ZERO_CLICK 0
+#define ONE_CLICK 1
+#define TWO_CLICK 2
 typedef enum {
 	IDLE, MEASURMENT, WAIT, CONFIGURATION,
 } measurment_state_t;
 
+static measurment_state_t actual_state;
+
 /*Estructura donde se almancena la última muestra tomada*/
 static struct air air_p;
 
-delay_t measurement_period;
-uint16_t period_init_ms = 500;
+static delay_t measurement_period;
+static uint16_t period_init_ms = 500;
 
-#define ZERO_CLICK 0
-#define ONE_CLICK 1
-#define TWO_CLICK 2
 
-static measurment_state_t actual_state;
 /*Imprimo los valores de Co2, humedad y temperatura en consola separados con un tabulador, al final se agrega salto de linea*/
 static void print_measurement() {
 	char buffer[10];

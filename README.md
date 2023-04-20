@@ -2,7 +2,8 @@
 Trabajo Final para la materia PCSE y PdM
 Autor: Leandro Díaz diazleandro1012@gmail.com
 
-El proyecto implementa dos drivers portables para sensores que permiten medir variables del aire. El sensor sunrise permite medir el Co2 del ambiente y el sensor sht4x podemos medir temperatura y humedad. La realización de este driver. La aplicación, no portable desarrollada en la placa NUCLEO-F429ZI, envía los datos de los sensores (Co2, temperatura y humedad) a la PC de forma serial cada X segundos. Se puede pausar o reanudar la adquisición de datos mediante el botón de la placa NUCELO, así como también, entrar a un modo configuración presionando dos veces el botón. En este modo se puede cambiar la frecuencia con la que se adquieren los datos.
+El proyecto implementa dos drivers portables para sensores que permiten medir variables del aire. Estos son el sensor sunrise (https://senseair.com/products/power-counts/sunrise-hvac/) y el sensor sht4x(https://sensirion.com/media/documents/33FD6951/63E1087C/Datasheet_SHT4x_1.pdf).  
+El sensor sunrise permite medir el Co2 del ambiente y el sensor sht4x podemos medir temperatura y humedad. La realización de este driver. La aplicación, no portable desarrollada en la placa NUCLEO-F429ZI, envía los datos de los sensores (Co2, temperatura y humedad) a la PC de forma serial cada X segundos. Se puede pausar o reanudar la adquisición de datos mediante el botón de la placa NUCELO, así como también, entrar a un modo configuración presionando dos veces el botón. En este modo se puede cambiar la frecuencia con la que se adquieren los datos.
 
 Detalle de los módulos:
 

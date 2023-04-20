@@ -8,6 +8,7 @@
 #include "sht4x_port.h"
 #include "stm32f4xx_hal.h"  		/* <- HAL include */
 #include <stdint.h>
+#include "API_uart.h"
 
 /*Copia local de la configuración i2c*/
 static I2C_HandleTypeDef *p_hi2c_sunrise;
