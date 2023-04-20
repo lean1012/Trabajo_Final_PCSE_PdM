@@ -14,6 +14,9 @@
 void init_sensors(void * i2c_init){
 	 sht4x_init(i2c_init);
 	 sunrise_init(i2c_init);
+	 //set_period(2);
+	 //set_number_samples(1);
+
 
 }
 

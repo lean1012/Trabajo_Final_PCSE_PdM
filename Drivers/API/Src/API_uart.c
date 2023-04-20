@@ -17,7 +17,7 @@ static UART_HandleTypeDef UartHandle;
 
 #define UART_BaudRate 115200
 
-uint8_t conf_uart[]="UART INICIALIZADA EN 9600 8N1\r\n"; //(1 bit de inicio, 8 bits de datos, ningún (N) bit de paridad, y un (1) bit de parada)";
+uint8_t conf_uart[]="UART INICIALIZADA EN 115200 8N1\r\n"; //(1 bit de inicio, 8 bits de datos, ningún (N) bit de paridad, y un (1) bit de parada)";
 
 
 bool_t uartInit(){

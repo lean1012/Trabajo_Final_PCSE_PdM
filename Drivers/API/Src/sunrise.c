@@ -62,6 +62,8 @@ static uint16_t buffer_to_uint16_t(const uint8_t *bytes) {
 
 int8_t sunrise_init(void *i2c_init) {
 	sunrise_init_port(i2c_init);
+	uint8_t msg[] = "Inicialización correcta del sensor sunrise. \r\n";
+	sunrise_print(msg,sizeof(msg));
 	return 0;
 }
 

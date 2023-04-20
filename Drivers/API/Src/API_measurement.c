@@ -29,7 +29,7 @@ static measurment_state_t actual_state;
 static struct air air_p;
 
 static delay_t measurement_period;
-static uint16_t period_init_ms = 500;
+static uint16_t period_init_ms = 5000;
 
 
 /*Imprimo los valores de Co2, humedad y temperatura en consola separados con un tabulador, al final se agrega salto de linea*/
