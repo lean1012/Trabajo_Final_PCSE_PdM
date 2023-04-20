@@ -69,6 +69,10 @@ int8_t sunrise_init(void *i2c_init) {
 static int8_t weak_sunrise(uint8_t address){
 
 	int8_t err = sunrise_write(address, 0, 0);
+	if (err < 0) {
+			return err;
+	}
+	return 0;
 }
 
 static int8_t write_multiple_register(uint8_t address, uint8_t reg_addr_start,
@@ -108,8 +112,8 @@ static int8_t read_multiple_register(uint8_t address, uint8_t reg_addr_start,
 	 * Luego está pronto para realizar las operaciones de lectura/escritura.
 	*/
 	weak_sunrise(address);
-	int8_t err = sunrise_write(address, &reg_addr_start, 0);
-	err = sunrise_write(address, &reg_addr_start, 1);
+	//int8_t err = sunrise_write(address, &reg_addr_start, 0);
+	int8_t err = sunrise_write(address, &reg_addr_start, 1);
 	if (err < 0) {
 		return err;
 	}
@@ -131,7 +135,7 @@ int8_t sunrise_read_co2_filtered(uint16_t *co2) {
 	}
 	*co2 = buffer_to_uint16_t(rx);
 	// controlo que el valor a enviar esté dentro de los parámetros del sensor (0-10000ppm de Co2 capaz de leer)
-	if ((*co2 > 0) && (*co2 < 10000)) {
+	if ((*co2 < CO2_MIN) && (*co2 > CO2_MAX)) {
 		return -1;
 	}
 	return 0;

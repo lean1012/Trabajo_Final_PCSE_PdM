@@ -18,6 +18,15 @@ void init_sensors(void * i2c_init){
 }
 
 void measurement(struct air * p_air) {
-	sunrise_read_co2_filtered(&p_air->co2);
-	sht4x_temp_hum_low_presition(&p_air->temp, &p_air->hum);
+	//si las lecturas dan con error grabo 0
+	int8_t err = sunrise_read_co2_filtered(&p_air->co2);
+	if(err<0){
+		p_air->co2=0;
+	}
+	err = sht4x_temp_hum_low_presition(&p_air->temp, &p_air->hum);
+	if(err<0){
+			p_air->temp=0;
+			p_air->hum=0;
+		}
+
 }
