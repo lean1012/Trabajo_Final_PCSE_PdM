@@ -46,13 +46,14 @@ void clickFSM_update() {
 		break;
 
 	case WAIT_2CLICK:
-		if (delayRead(&delay_click)) {
-			if (readKey()) {
-				click_count = 2;
-			} else {
-				click_count = 1;
-			}
+		if (readKey()) {
+			click_count = 2;
 			actual_state_click = WAIT_1CLICK;
+		}else{
+			if (delayRead(&delay_click)) {
+				click_count = 1;
+				actual_state_click = WAIT_1CLICK;
+			}
 		}
 		break;
 	default:
